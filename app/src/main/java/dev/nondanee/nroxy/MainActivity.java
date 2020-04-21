@@ -14,8 +14,8 @@ import android.os.Messenger;
 import android.os.RemoteException;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.CompoundButton;
@@ -70,9 +70,9 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
-        checkOnStart();
+//        checkOnStart();
     }
-
+/*
     private void checkOnStart() {
         int version = preferences.getInt("version", 0);
         if (version < BuildConfig.VERSION_CODE) {
@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
-
+*/
     private boolean tunnelRunning() {
         return tunnelService != null && tunnelService.running();
     }
@@ -118,8 +118,8 @@ public class MainActivity extends AppCompatActivity {
         toggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                boolean shell = preferences.getBoolean("shell", true);
-                boolean vpn = preferences.getBoolean("vpn", true);
+                boolean shell = preferences.getBoolean("shell", false);
+                boolean vpn = preferences.getBoolean("vpn", false);
 
                 if (isChecked) {
                     if (!tunnelRunning() && vpn) startVpn();
@@ -146,11 +146,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void startShell() {
+        String bin = "libnode.so"; // binary file with fake name (only libxxx.so can be extracted)
         String path = preferences.getString("path", "");
         String argv = preferences.getString("argv", "");
-        String command = "node" + " " + path + " " + argv;
+        String command = bin + " " + path + " " + argv;
         List<String> env = new ArrayList(Arrays.asList(preferences.getString("env", "").split("\\s*,\\s*")));
-        env.add("PATH=$PATH:" + (getFilesDir().getAbsolutePath() + File.separator + "usr" + File.separator + "bin"));
+        env.add("PATH=$PATH:" + getApplicationInfo().nativeLibraryDir);
         env.removeAll(Arrays.asList("", null));
 //        Log.d(TAG, "startShell: command: " + command + " env: " + env + " env length: " + env.size());
 
